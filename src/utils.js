@@ -11,10 +11,10 @@ export const html = `
   form { margin-bottom: 2em; }
   label { display: block; margin: 0.5em 0 0.2em; }
   input[type="text"], input[type="url"] { width: 100%; padding: 0.4em; }
-  button { margin-top: 1em; padding: 0.6em 1.2em; }
-  #result img { display: block; margin-top: 1em; }
+  button { margin-top: 1em; padding: 0.6em 1.2em; cursor: pointer; }
   #result, #update-result { margin-top: 1em; color: green; }
   #error, #update-error { margin-top: 1em; color: red; }
+  p.info { font-size: 0.9em; color: #555; }
 </style>
 </head>
 <body>
@@ -42,6 +42,12 @@ export const html = `
     <div id="update-error"></div>
   </section>
 
+  <section>
+    <p class="info">
+      需要二维码？请复制短链接地址，然后访问 <a href="https://qr.ioi.tw/zh-cn/" target="_blank" rel="noopener noreferrer">QR码生成器</a> 粘贴生成二维码。
+    </p>
+  </section>
+
   <script>
     const createForm = document.getElementById('createForm')
     const updateForm = document.getElementById('updateForm')
@@ -67,8 +73,7 @@ export const html = `
         if (res.ok) {
           resultDiv.innerHTML = \`
             <p>创建成功！短码：<b>\${data.code}</b></p>
-            <p>短链接：<a href="\${data.shortUrl}" target="_blank">\${data.shortUrl}</a></p>
-            <img src="\${data.qrUrl}" alt="二维码" />
+            <p>短链接：<a href="\${data.shortUrl}" target="_blank" rel="noopener noreferrer">\${data.shortUrl}</a></p>
           \`
         } else {
           errorDiv.textContent = data.error || '创建失败'

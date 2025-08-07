@@ -1,31 +1,38 @@
-import { html } from './utils.js'  // 你的静态页面内容
+import { html } from './utils.js'
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url)
     const pathname = url.pathname
 
-    // 创建短链接口
+    // 创建短链接接口
     if (request.method === 'POST' && pathname === '/api/create') {
       const form = await request.formData()
       const targetUrl = form.get('url')?.trim()
       const customCode = form.get('code')?.trim()
 
       if (!targetUrl || !customCode) {
-        return new Response(JSON.stringify({ error: '请提供目标链接和自定义短码' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
+        return new Response(
+          JSON.stringify({ error: '请提供目标链接和自定义短码' }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        )
       }
 
-      // 尝试插入，若短码已存在返回错误
       try {
         await env.DB.prepare('INSERT INTO links (code, url) VALUES (?, ?)').bind(customCode, targetUrl).run()
       } catch (e) {
-        return new Response(JSON.stringify({ error: '短码已存在，请更换自定义码' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
+        return new Response(
+          JSON.stringify({ error: '短码已存在，请更换自定义码' }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        )
       }
 
       const shortUrl = `${url.origin}/${customCode}`
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&ecc=H&data=${encodeURIComponent(shortUrl)}`
-
-      return new Response(JSON.stringify({ code: customCode, shortUrl, qrUrl }), { headers: { 'Content-Type': 'application/json' } })
+      // 这里不生成二维码，留给用户自行生成
+      return new Response(
+        JSON.stringify({ code: customCode, shortUrl }),
+        { headers: { 'Content-Type': 'application/json' } }
+      )
     }
 
     // 修改短码对应的目标链接接口
@@ -35,23 +42,35 @@ export default {
       const newUrl = form.get('url')?.trim()
 
       if (!code || !newUrl) {
-        return new Response(JSON.stringify({ error: '请提供短码和新的目标链接' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
+        return new Response(
+          JSON.stringify({ error: '请提供短码和新的目标链接' }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        )
       }
 
       try {
         const result = await env.DB.prepare('UPDATE links SET url = ? WHERE code = ?').bind(newUrl, code).run()
         if (result.changes === 0) {
-          return new Response(JSON.stringify({ error: '短码不存在' }), { status: 404, headers: { 'Content-Type': 'application/json' } })
+          return new Response(
+            JSON.stringify({ error: '短码不存在' }),
+            { status: 404, headers: { 'Content-Type': 'application/json' } }
+          )
         }
-        return new Response(JSON.stringify({ message: '更新成功' }), { headers: { 'Content-Type': 'application/json' } })
+        return new Response(
+          JSON.stringify({ message: '更新成功' }),
+          { headers: { 'Content-Type': 'application/json' } }
+        )
       } catch (e) {
-        return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+        return new Response(
+          JSON.stringify({ error: e.message }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        )
       }
     }
 
     // 首页，返回简单页面
     if (pathname === '/') {
-      return new Response(html, { headers: { 'Content-Type': 'text/html' } })
+      return new Response(html, { headers: { 'Content-Type': 'text/html;charset=utf-8' } })
     }
 
     // 访问短码跳转逻辑
