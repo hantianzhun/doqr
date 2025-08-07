@@ -1,49 +1,107 @@
-export const html = `<!DOCTYPE html>
-<html>
+export const html = `
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <title>动态二维码短链服务</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 2rem; max-width: 500px; margin: auto; }
-    input, button { padding: 0.5rem; margin: 0.5rem 0; width: 100%; font-size: 1rem; }
-    img { margin-top: 1rem; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>动态短链接服务</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 600px; margin: 2em auto; }
+  h1 { text-align: center; }
+  form { margin-bottom: 2em; }
+  label { display: block; margin: 0.5em 0 0.2em; }
+  input[type="text"], input[type="url"] { width: 100%; padding: 0.4em; }
+  button { margin-top: 1em; padding: 0.6em 1.2em; }
+  #result img { display: block; margin-top: 1em; }
+  #result, #update-result { margin-top: 1em; color: green; }
+  #error, #update-error { margin-top: 1em; color: red; }
+</style>
 </head>
 <body>
-  <h1>生成动态二维码短链</h1>
-  <form id="form">
-    <input type="url" name="url" placeholder="目标网址" required />
-    <input type="text" name="code" placeholder="自定义短码（可选）" maxlength="10" />
-    <button type="submit">生成短链和二维码</button>
-  </form>
-  <div id="result"></div>
+  <h1>动态短链接服务</h1>
+
+  <section>
+    <h2>创建短链接</h2>
+    <form id="createForm">
+      <label>原始链接(URL)：<input type="url" id="url" required placeholder="https://example.com" /></label>
+      <label>自定义短码(Code)：<input type="text" id="code" required placeholder="例如 abc123" /></label>
+      <button type="submit">创建</button>
+    </form>
+    <div id="result"></div>
+    <div id="error"></div>
+  </section>
+
+  <section>
+    <h2>更新短链接目标地址</h2>
+    <form id="updateForm">
+      <label>短码(Code)：<input type="text" id="updateCode" required placeholder="例如 abc123" /></label>
+      <label>新的目标链接(URL)：<input type="url" id="updateUrl" required placeholder="https://newexample.com" /></label>
+      <button type="submit">更新</button>
+    </form>
+    <div id="update-result"></div>
+    <div id="update-error"></div>
+  </section>
 
   <script>
-    const form = document.getElementById('form')
-    const result = document.getElementById('result')
+    const createForm = document.getElementById('createForm')
+    const updateForm = document.getElementById('updateForm')
+    const resultDiv = document.getElementById('result')
+    const errorDiv = document.getElementById('error')
+    const updateResultDiv = document.getElementById('update-result')
+    const updateErrorDiv = document.getElementById('update-error')
 
-    form.addEventListener('submit', async (e) => {
+    createForm.addEventListener('submit', async e => {
       e.preventDefault()
-      result.innerHTML = '生成中...'
-      const formData = new FormData(form)
+      resultDiv.textContent = ''
+      errorDiv.textContent = ''
+      const url = document.getElementById('url').value.trim()
+      const code = document.getElementById('code').value.trim()
 
-      const resp = await fetch('/api/create', {
-        method: 'POST',
-        body: formData
-      })
+      const formData = new FormData()
+      formData.append('url', url)
+      formData.append('code', code)
 
-      if (!resp.ok) {
-        const err = await resp.json()
-        result.innerHTML = '<p style="color:red;">错误：' + (err.error || '未知错误') + '</p>'
-        return
+      try {
+        const res = await fetch('/api/create', { method: 'POST', body: formData })
+        const data = await res.json()
+        if (res.ok) {
+          resultDiv.innerHTML = \`
+            <p>创建成功！短码：<b>\${data.code}</b></p>
+            <p>短链接：<a href="\${data.shortUrl}" target="_blank">\${data.shortUrl}</a></p>
+            <img src="\${data.qrUrl}" alt="二维码" />
+          \`
+        } else {
+          errorDiv.textContent = data.error || '创建失败'
+        }
+      } catch (err) {
+        errorDiv.textContent = '请求出错'
       }
+    })
 
-      const data = await resp.json()
-      result.innerHTML = \`
-        <p>短链：<a href="\${data.shortUrl}" target="_blank">\${data.shortUrl}</a></p>
-        <img src="\${data.qrUrl}" alt="二维码" />
-      \`
+    updateForm.addEventListener('submit', async e => {
+      e.preventDefault()
+      updateResultDiv.textContent = ''
+      updateErrorDiv.textContent = ''
+      const code = document.getElementById('updateCode').value.trim()
+      const url = document.getElementById('updateUrl').value.trim()
+
+      const formData = new FormData()
+      formData.append('code', code)
+      formData.append('url', url)
+
+      try {
+        const res = await fetch('/api/update', { method: 'POST', body: formData })
+        const data = await res.json()
+        if (res.ok) {
+          updateResultDiv.textContent = '更新成功'
+        } else {
+          updateErrorDiv.textContent = data.error || '更新失败'
+        }
+      } catch (err) {
+        updateErrorDiv.textContent = '请求出错'
+      }
     })
   </script>
 </body>
-</html>`
+</html>
+`
