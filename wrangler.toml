@@ -1,9 +1,9 @@
-name = "cf-d1-dynamic-qr"
+name = "doqr"
 type = "javascript"
-account_id = "你的 Cloudflare 账号ID"
 workers_dev = true
 compatibility_date = "2023-10-01"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "你的D1数据库名"
+database_name = "qr"
+database_id = "eb21ee22-cea6-4dfb-bf33-2bcfef13426a"
