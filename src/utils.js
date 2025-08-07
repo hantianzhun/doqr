@@ -2,111 +2,85 @@ export const html = `
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>动态短链接服务</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 700px; margin: 2em auto; }
-    h1 { text-align: center; margin-bottom: 1em; }
-    .section { border: 1px solid #ccc; margin-bottom: 1em; border-radius: 6px; overflow: hidden; }
-    .section h2 {
-      background-color: #f5f5f5;
-      margin: 0;
-      padding: 0.8em 1em;
-      font-size: 1.1em;
-      cursor: pointer;
-      user-select: none;
-    }
-    .section .content {
-      display: none;
-      padding: 1em;
-      background-color: #fff;
-    }
-    .section.active .content {
-      display: block;
-    }
-    form label { display: block; margin: 0.5em 0 0.2em; }
-    input[type="text"], input[type="url"] {
-      width: 100%; padding: 0.4em; box-sizing: border-box;
-    }
-    button {
-      margin-top: 1em; padding: 0.6em 1.2em;
-      cursor: pointer; background-color: #007bff;
-      border: none; color: white; border-radius: 4px;
-    }
-    #result, #error, #update-result, #update-error {
-      margin-top: 1em;
-      font-weight: bold;
-    }
-    #result, #update-result { color: green; }
-    #error, #update-error { color: red; }
-    p.info { font-size: 0.9em; color: #555; margin-top: 0.5em; }
-    ul#linkList { list-style: none; padding-left: 0; }
-    ul#linkList li {
-      margin-bottom: 0.5em;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 0.5em;
-      cursor: pointer;
-    }
-    ul#linkList li .details {
-      display: none;
-      margin-top: 0.3em;
-      font-size: 0.9em;
-      color: #333;
-      word-break: break-word;
-    }
-    ul#linkList li.expanded .details {
-      display: block;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>动态短链接服务</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 800px; margin: 2em auto; }
+  h1 { text-align: center; }
+  details { margin-bottom: 1.5em; border: 1px solid #ccc; border-radius: 5px; padding: 1em; background: #f9f9f9; }
+  details summary { font-weight: bold; font-size: 1.1em; cursor: pointer; }
+  label { display: block; margin: 0.8em 0 0.3em; }
+  input[type="text"], input[type="url"] { width: 100%; padding: 0.5em; font-size: 1em; }
+  button { margin-top: 1em; padding: 0.6em 1.2em; font-size: 1em; cursor: pointer; }
+  #result, #update-result { margin-top: 1em; color: green; }
+  #error, #update-error { margin-top: 1em; color: red; }
+  p.info { font-size: 0.9em; color: #555; }
+
+  ul#linkList { list-style: none; padding-left: 0; }
+  ul#linkList li { 
+    margin-bottom: 0.6em; 
+    border: 1px solid #ddd; 
+    border-radius: 5px; 
+    padding: 0.8em; 
+    background: #fff; 
+    position: relative; 
+  }
+  ul#linkList li .details { display: none; margin-top: 0.5em; font-size: 0.9em; color: #333; word-break: break-all; }
+  ul#linkList li.expanded .details { display: block; }
+
+  .delete-btn {
+    position: absolute;
+    top: 0.5em;
+    right: 0.8em;
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 0.3em 0.6em;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.8em;
+  }
+</style>
 </head>
 <body>
   <h1>动态短链接服务</h1>
 
-  <div class="section active">
-    <h2 onclick="toggleSection(this)">创建短链接</h2>
-    <div class="content">
-      <form id="createForm">
-        <label>原始链接(URL)：<input type="url" id="url" required placeholder="https://example.com" /></label>
-        <label>自定义短码(Code)：<input type="text" id="code" required placeholder="例如 abc123" /></label>
-        <button type="submit">创建</button>
-      </form>
-      <div id="result"></div>
-      <div id="error"></div>
-      <p class="info">
-        需要二维码？复制短链接地址后访问
-        <a href="https://qr.ioi.tw/zh-cn/" target="_blank" rel="noopener noreferrer">QR码生成器</a>
-        粘贴生成二维码。
-      </p>
-    </div>
-  </div>
+  <details open>
+    <summary>创建短链接</summary>
+    <form id="createForm">
+      <label>原始链接(URL)：<input type="url" id="url" required placeholder="https://example.com" /></label>
+      <label>自定义短码(Code)：<input type="text" id="code" required placeholder="例如 abc123" /></label>
+      <button type="submit">创建</button>
+    </form>
+    <div id="result"></div>
+    <div id="error"></div>
+  </details>
 
-  <div class="section">
-    <h2 onclick="toggleSection(this)">已有短码列表（点击展开查看目标链接）</h2>
-    <div class="content">
-      <ul id="linkList"><li>加载中...</li></ul>
-    </div>
-  </div>
+  <details>
+    <summary>已有短码列表（点击每项展开详情并支持删除）</summary>
+    <ul id="linkList"><li>加载中...</li></ul>
+  </details>
 
-  <div class="section">
-    <h2 onclick="toggleSection(this)">更新短链接目标地址</h2>
-    <div class="content">
-      <form id="updateForm">
-        <label>短码(Code)：<input type="text" id="updateCode" required placeholder="例如 abc123" /></label>
-        <label>新的目标链接(URL)：<input type="url" id="updateUrl" required placeholder="https://newexample.com" /></label>
-        <button type="submit">更新</button>
-      </form>
-      <div id="update-result"></div>
-      <div id="update-error"></div>
-    </div>
-  </div>
+  <details>
+    <summary>更新短链接目标地址</summary>
+    <form id="updateForm">
+      <label>短码(Code)：<input type="text" id="updateCode" required placeholder="例如 abc123" /></label>
+      <label>新的目标链接(URL)：<input type="url" id="updateUrl" required placeholder="https://newexample.com" /></label>
+      <button type="submit">更新</button>
+    </form>
+    <div id="update-result"></div>
+    <div id="update-error"></div>
+  </details>
+
+  <details>
+    <summary>二维码生成说明</summary>
+    <p class="info">
+      需要二维码？请复制短链接地址，然后访问 <a href="https://goqr.me/" target="_blank" rel="noopener noreferrer">https://goqr.me/</a> 粘贴生成二维码。
+    </p>
+  </details>
 
   <script>
-    function toggleSection(header) {
-      const section = header.parentElement
-      section.classList.toggle('active')
-    }
-
     const createForm = document.getElementById('createForm')
     const updateForm = document.getElementById('updateForm')
     const resultDiv = document.getElementById('result')
@@ -129,13 +103,35 @@ export const html = `
           const li = document.createElement('li')
           li.textContent = code
           li.title = '点击查看/隐藏目标链接'
-          const details = document.createElement('div')
-          details.className = 'details'
-          details.textContent = url
-          li.appendChild(details)
           li.addEventListener('click', () => {
             li.classList.toggle('expanded')
           })
+
+          const details = document.createElement('div')
+          details.className = 'details'
+          details.innerHTML = \`<strong>目标链接：</strong><br><a href="\${url}" target="_blank">\${url}</a>\`
+          li.appendChild(details)
+
+          const delBtn = document.createElement('button')
+          delBtn.textContent = '删除'
+          delBtn.className = 'delete-btn'
+          delBtn.addEventListener('click', async e => {
+            e.stopPropagation()
+            if (!confirm(\`确定删除短码 \${code} 吗？\`)) return
+            try {
+              const res = await fetch(\`/api/delete?code=\${encodeURIComponent(code)}\`, { method: 'DELETE' })
+              const result = await res.json()
+              if (res.ok) {
+                fetchLinks()
+              } else {
+                alert(result.error || '删除失败')
+              }
+            } catch {
+              alert('请求失败')
+            }
+          })
+          li.appendChild(delBtn)
+
           linkList.appendChild(li)
         })
       } catch (err) {
@@ -149,6 +145,7 @@ export const html = `
       errorDiv.textContent = ''
       const url = document.getElementById('url').value.trim()
       const code = document.getElementById('code').value.trim()
+
       const formData = new FormData()
       formData.append('url', url)
       formData.append('code', code)
@@ -176,6 +173,7 @@ export const html = `
       updateErrorDiv.textContent = ''
       const code = document.getElementById('updateCode').value.trim()
       const url = document.getElementById('updateUrl').value.trim()
+
       const formData = new FormData()
       formData.append('code', code)
       formData.append('url', url)
@@ -194,6 +192,7 @@ export const html = `
       }
     })
 
+    // 页面加载时获取短链列表
     fetchLinks()
   </script>
 </body>
