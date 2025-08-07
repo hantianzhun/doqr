@@ -19,7 +19,9 @@ export const html = `
     input[type="text"], input[type="url"] {
       padding: 0.5rem;
       margin-right: 0.5rem;
-      width: 200px;
+      width: 250px;
+      max-width: 100%;
+      box-sizing: border-box;
     }
     button {
       padding: 0.5rem 1rem;
@@ -43,6 +45,10 @@ export const html = `
     }
     .actions {
       margin-top: 0.5rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
     }
     .code-url {
       display: flex;
@@ -56,9 +62,9 @@ export const html = `
       margin-left: 1rem;
     }
     .edit-url {
-      width: 100%;
+      flex-grow: 1;
+      min-width: 200px;
       padding: 0.5rem;
-      margin-top: 0.5rem;
       box-sizing: border-box;
     }
   </style>
@@ -86,7 +92,7 @@ export const html = `
         div.className = 'entry'
         div.innerHTML = \`
           <div class="code-url">
-            <span>短码：<a href="/\${code}" target="_blank" rel="noopener noreferrer">https://qr.hanli.dpdns.org/\${code}</a></span>
+            <span>短码：<a href="/\${code}" target="_blank" rel="noopener noreferrer">\${code}</a></span>
             <div>
               <button class="delete-btn">删除</button>
             </div>
@@ -102,11 +108,14 @@ export const html = `
           </div>
         \`
 
+        // 点击整个条目展开/收起，输入框和按钮点击阻止展开
         div.addEventListener('click', (e) => {
           if (
             e.target.classList.contains('delete-btn') ||
             e.target.classList.contains('update-btn') ||
-            e.target.tagName === 'A'
+            e.target.tagName === 'A' ||
+            e.target.classList.contains('edit-url') ||
+            e.target.tagName === 'INPUT'
           ) {
             return
           }
