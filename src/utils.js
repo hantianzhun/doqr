@@ -78,6 +78,8 @@ export const html = `
     <button type="submit">创建</button>
   </form>
 
+  <h2>需要二维码？请复制短链接地址，然后访问 <a href="https://qr.ioi.tw/zh-cn/" target="_blank" rel="noopener noreferrer">二维码生成器</a> 粘贴生成二维码。</h2>
+
   <div id="list"></div>
 
   <script>
@@ -92,7 +94,7 @@ export const html = `
         div.className = 'entry'
         div.innerHTML = \`
           <div class="code-url">
-            <span>短码：<a href="/\${code}" target="_blank" rel="noopener noreferrer">\${code}</a></span>
+            <span>短码：<a href="/\${code}" target="_blank" rel="noopener noreferrer">https://qr.hanli.dpdns.org/\${code}</a></span>
             <div>
               <button class="delete-btn">删除</button>
             </div>
