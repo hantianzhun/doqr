@@ -14,7 +14,7 @@ export const html = `
   button { margin-top: 1em; padding: 0.6em 1.2em; cursor: pointer; }
   #result, #update-result { margin-top: 1em; color: green; }
   #error, #update-error { margin-top: 1em; color: red; }
-  p.info { font-size: 2em; color: #555; }
+  p.info { font-size: 1.5em; color: #555; }
 </style>
 </head>
 <body>
@@ -32,6 +32,12 @@ export const html = `
   </section>
 
   <section>
+    <p class="info">
+      需要二维码？请复制短链接地址，然后访问 <a href="https://qr.ioi.tw/zh-cn/" target="_blank" rel="noopener noreferrer">QR码生成器</a> 粘贴生成二维码。
+    </p>
+  </section>
+
+  <section>
     <h2>更新短链接目标地址</h2>
     <form id="updateForm">
       <label>短码(Code)：<input type="text" id="updateCode" required placeholder="例如 abc123" /></label>
@@ -41,13 +47,7 @@ export const html = `
     <div id="update-result"></div>
     <div id="update-error"></div>
   </section>
-
-  <section>
-    <p class="info">
-      需要二维码？请复制短链接地址，然后访问 <a href="https://qr.ioi.tw/zh-cn/" target="_blank" rel="noopener noreferrer">QR码生成器</a> 粘贴生成二维码。
-    </p>
-  </section>
-
+  
   <script>
     const createForm = document.getElementById('createForm')
     const updateForm = document.getElementById('updateForm')
@@ -111,3 +111,4 @@ export const html = `
 </html>
 
 `
+
