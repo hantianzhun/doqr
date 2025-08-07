@@ -14,7 +14,7 @@ export const html = `
   button { margin-top: 1em; padding: 0.6em 1.2em; cursor: pointer; }
   #result, #update-result { margin-top: 1em; color: green; }
   #error, #update-error { margin-top: 1em; color: red; }
-  p.info { font-size: 0.9em; color: #555; }
+  p.info { font-size: 2em; color: #555; }
 </style>
 </head>
 <body>
@@ -109,4 +109,5 @@ export const html = `
   </script>
 </body>
 </html>
+
 `
