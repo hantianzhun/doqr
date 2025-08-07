@@ -5,8 +5,8 @@ export default {
     const url = new URL(request.url)
     const pathname = url.pathname
 
-    // 创建短链接接口
     if (request.method === 'POST' && pathname === '/api/create') {
+      // ...原创建代码不变...
       const form = await request.formData()
       const targetUrl = form.get('url')?.trim()
       const customCode = form.get('code')?.trim()
@@ -28,15 +28,14 @@ export default {
       }
 
       const shortUrl = `${url.origin}/${customCode}`
-      // 这里不生成二维码，留给用户自行生成
       return new Response(
         JSON.stringify({ code: customCode, shortUrl }),
         { headers: { 'Content-Type': 'application/json' } }
       )
     }
 
-    // 修改短码对应的目标链接接口
     if (request.method === 'POST' && pathname === '/api/update') {
+      // ...更新代码不变...
       const form = await request.formData()
       const code = form.get('code')?.trim()
       const newUrl = form.get('url')?.trim()
@@ -68,12 +67,25 @@ export default {
       }
     }
 
-    // 首页，返回简单页面
+    // 新增 - 返回全部短码列表接口
+    if (request.method === 'GET' && pathname === '/api/list') {
+      try {
+        const { results } = await env.DB.prepare('SELECT code, url FROM links ORDER BY code').all()
+        return new Response(JSON.stringify(results), {
+          headers: { 'Content-Type': 'application/json' }
+        })
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
+    }
+
     if (pathname === '/') {
       return new Response(html, { headers: { 'Content-Type': 'text/html;charset=utf-8' } })
     }
 
-    // 访问短码跳转逻辑
     const code = pathname.slice(1)
     if (!code) {
       return new Response('请输入短码', { status: 400 })
