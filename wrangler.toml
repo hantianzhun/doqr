@@ -1,9 +1,10 @@
 name = "doqr"
-type = "javascript"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
 workers_dev = true
-compatibility_date = "2023-10-01"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "qr"
 database_id = "eb21ee22-cea6-4dfb-bf33-2bcfef13426a"
+
