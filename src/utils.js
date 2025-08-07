@@ -24,6 +24,7 @@ export const html = `
     button {
       padding: 0.5rem 1rem;
       margin-left: 0.5rem;
+      cursor: pointer;
     }
     .entry {
       background: white;
@@ -31,6 +32,7 @@ export const html = `
       margin-bottom: 0.5rem;
       border-radius: 6px;
       border: 1px solid #ccc;
+      user-select: none;
     }
     .details {
       margin-top: 0.5rem;
@@ -49,7 +51,6 @@ export const html = `
     }
     .code-url span {
       font-weight: bold;
-      cursor: pointer;
     }
     .code-url button {
       margin-left: 1rem;
@@ -58,6 +59,7 @@ export const html = `
       width: 100%;
       padding: 0.5rem;
       margin-top: 0.5rem;
+      box-sizing: border-box;
     }
   </style>
 </head>
@@ -84,21 +86,44 @@ export const html = `
         div.className = 'entry'
         div.innerHTML = \`
           <div class="code-url">
-            <span onclick="this.parentNode.parentNode.classList.toggle('open')">短码：<a href="/\${code}" target="_blank">\${code}</a></span>
+            <span>短码：<a href="/\${code}" target="_blank" rel="noopener noreferrer">https://qr.hanli.dpdns.org/\${code}</a></span>
             <div>
-              <button onclick="deleteCode('\${code}')">删除</button>
+              <button class="delete-btn">删除</button>
             </div>
           </div>
           <div class="details">
             <div>
-              当前链接：<a href="\${url}" target="_blank">\${url}</a>
+              当前链接：<a href="\${url}" target="_blank" rel="noopener noreferrer">\${url}</a>
             </div>
             <div class="actions">
               <input type="url" placeholder="修改后的链接" class="edit-url" value="\${url}" />
-              <button onclick="updateUrl('\${code}', this.previousElementSibling.value)">保存修改</button>
+              <button class="update-btn">保存修改</button>
             </div>
           </div>
         \`
+
+        div.addEventListener('click', (e) => {
+          if (
+            e.target.classList.contains('delete-btn') ||
+            e.target.classList.contains('update-btn') ||
+            e.target.tagName === 'A'
+          ) {
+            return
+          }
+          div.classList.toggle('open')
+        })
+
+        div.querySelector('.delete-btn').onclick = (e) => {
+          e.stopPropagation()
+          deleteCode(code)
+        }
+
+        div.querySelector('.update-btn').onclick = (e) => {
+          e.stopPropagation()
+          const newUrl = div.querySelector('.edit-url').value
+          updateUrl(code, newUrl)
+        }
+
         list.appendChild(div)
       })
     }
