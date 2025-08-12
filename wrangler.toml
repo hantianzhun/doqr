@@ -1,4 +1,4 @@
-name = "doqr"
+name = "short"
 main = "src/index.js"
 compatibility_date = "2024-01-01"
 workers_dev = true
@@ -7,3 +7,4 @@ workers_dev = true
 binding = "DB"
 database_name = "short"
 database_id = "205c5d3d-653f-46ff-89d0-14435f523b5e"
+
