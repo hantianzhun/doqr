@@ -5,6 +5,5 @@ workers_dev = true
 
 [[d1_databases]]
 binding = "DB"
-database_name = "qr"
-database_id = "eb21ee22-cea6-4dfb-bf33-2bcfef13426a"
-
+database_name = "short"
+database_id = "205c5d3d-653f-46ff-89d0-14435f523b5e"
